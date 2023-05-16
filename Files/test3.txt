@@ -1,0 +1,46 @@
+abstract class name extends Expr <Widget>
+{
+
+
+final int _counter = _counter +1 ;
+String name ;
+float  num = 0.5;
+
+
+
+@override
+void funName ()
+{
+for(int j ; j< 19; j++ ){
+for(int i=1 ; i< 15 ; i++)
+{
+ v = arr[i][j];
+
+}
+}
+
+}
+}
+
+abstract class name extends Expr <Widget>
+{
+
+
+final int _counter = _counter +1 ;
+String name ;
+float  num = 0.5;
+
+@override
+void funName ()
+{
+for(int j ; j< 19; j++ ){
+for(int i=1 ; i< 15 ; i++)
+{
+ v = arr[i][j];
+
+}
+}
+
+}
+}
+
