@@ -61,9 +61,5 @@ public class ObjectParameter extends ObjectNode {
         this.data = data;
     }
 
-    @Override
-    public String toString() {
-        return "ObjectParameter{"  + objectName + '\n'  + objectClass.toString() +"\n" + ID + "\n"  + call.toString() +"\n" + anonymousFunction.toString() +"\n"+ data.toString() +
-                '}';
-    }
+
 }

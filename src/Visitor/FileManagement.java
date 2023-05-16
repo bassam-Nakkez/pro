@@ -3,11 +3,13 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 public  class FileManagement {
 
     public static String  CssCode="\n";
-    public static String htmlCode ="\t";
+    public  String htmlCode ="\t <?php session_start();?> \n";
 
 
     public static void CreateFile(String path) {
@@ -36,15 +38,15 @@ public  class FileManagement {
         }
     }
 
-    public static void openFile(String str) throws IOException {
-        java.io.File htmlFile = new java.io.File(str);
-        Desktop.getDesktop().browse(htmlFile.toURI());
+    public static void openFile(String str) throws IOException, URISyntaxException {
+        URI uri=new URI("http://localhost/"+str);
+        Desktop.getDesktop().browse(uri);
     }
+
 
 
     public static void Overwrite(String str )  throws IOException
     {
-
         boolean appendFile = false ;
 
         File fnew = new File(str);
@@ -77,7 +79,7 @@ public  class FileManagement {
     {
         CssCode += code;
     }
-    public static void addToHtmlFile(String code)
+    public  void addToHtmlFile(String code)
     {
         htmlCode += code;
     }

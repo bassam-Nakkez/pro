@@ -27,8 +27,9 @@ stat
  |if_stat
  |loops
  |switch_stat
- |imports* SCO
- | widget
+ |imports* SCO //delete
+ |widget
+ |navigator
  ;
 
 
@@ -136,7 +137,7 @@ anonymousFunction : OP CP functionBody | functionBody ;
 
 arrowAndAnonFun:OP CP ARROW call |anonymousFunction | arrowFunction ;
 
-returnType: nameType | VOID | ID ;
+returnType: nameType | VOID ;
 parameterMethods : OP parameters  CP;
 
 /// parameter Call function >>-----------------
@@ -152,9 +153,9 @@ parameterVariableWithDec: nameType ID (E expr)?;
 
 
 functionBody : stat_block;
-return : RETURN NEW? ( objectClass| expr | call| widget ) SCO ;
-
-methodBody:  START  (stat |this)*  return? END;
+return : RETURN NEW? ( objectClass| expr | call| widget )  ;
+methodBlock : stat |this ;
+methodBody:  START  methodBlock*  ( return )* END;
 
 
 switch_stat : SWITCH OP switch_key CP switchBody;
@@ -162,17 +163,15 @@ switch_key : ID | INT_NUM;
 switchBody: START case+ default?  END ;
 case : CASE  (data)  CO  ( block   (BREAK SCO)* | return SCO)  ;
 default: DEFAULT CO ( block (BREAK SCO)* | return );
-
-
  // -------------------- <<  CLass >>-----------------
 
-classDeclaration : ABSTRACT? CLASS ID typeParameters? superclass?  interfaces?  classBody  ;
+classDeclaration : ABSTRACT? CLASS type_ID typeParameters? superclass?  interfaces? START classBody END ;
 
 property : decVar SCO ;
-classMethod : returnType ID parameterMethods methodBody ;
+method : (returnType| ID) ID parameterMethods methodBody ;
 constructor : ID parameterMethods+ methodBody  ;
-//defConstructor: ID OP CP functionBody;
-//withConstructors: constructor? (  ( OVERRIDE?  method )+ | property )* defConstructor? |defConstructor? (  ( OVERRIDE?  method )+ | property )* constructor?;
+defConstructor: ID OP CP functionBody;
+withConstructors: constructor? (  ( OVERRIDE?  method )+ | property )* defConstructor? |defConstructor? (  ( OVERRIDE?  method )+ | property )* constructor?;
 superclass : EXTENDS typeNotVoid (LT ID GT)? mixins? | mixins ;
 interfaces : IMPLEMENTS typeNotVoidList ;
 typeNotVoid: ID Q?  | ID COM ID ;
@@ -189,20 +188,21 @@ cond: call Q call (CO call)?;
 
 // ------------------------<<<  Object >>-----------------
 
-objectClass : CONST? NEW? ID OP (objectParameters |STRING_singl (COM objectParameters)?) CP;
+objectClass : CONST? NEW? ID OP (objectParameters)? CP;
+//objectClass : CONST? NEW? ID OP (objectParameters |STRING_singl (COM objectParameters)?) CP;
 
 objectParameter :ID CO NEW? (
-                LT ID GT OB objectClass CB
-                |ID? Q? objectClass
-                |LT ID GT OB objectClass CB
-                |data
-                |call
-                |anonArray COM?
-                |arrowAndAnonFun
-                |OB NEW? call (COM call )* CB
-                |cond
-                | FALSE
-                |TRUE )
+//                LT ID GT OB objectClass CB
+//                |ID? Q? objectClass
+//                |LT ID GT OB objectClass CB
+                    data
+//                |anonArray COM?
+//                |arrowAndAnonFun
+//                |OB NEW? call (COM call )* CB
+//                |cond
+//                | FALSE
+//                |TRUE
+                )
                 ;
 
 objectParameters : objectParameter ( COM objectParameter)* COM?;
@@ -212,7 +212,7 @@ objectMethod : ID DOT callFunction;
 callObject : objectClass;
 objectDeclaration : ID objectClass;
 
-classBody :START property* constructor? (  ( OVERRIDE?  classMethod ) | property  )* END ;
+classBody : (  ( OVERRIDE?  method )+ | property )* withConstructors? (  ( OVERRIDE?  method )+ | property )* ;
 
 
 const: CONST ID;
@@ -330,13 +330,27 @@ identi
           | image
           | scaffold COM?
           | materialApp
+          | textFiled COM?
         ;
+
+
 
 
 
 //----------------- Container Widget and its parameters -------------
 
+//textFiled
+textFiled: TextFiled OP  attribute+ CP;
+                          attribute: (width COM?|inputDecoration COM?|controller COM?);
+                          inputDecoration: DECORATION  INPUTDECORATION OP label CP;
+                          label: LABELTEXT STRING;
+                          controller: CONTROLLER ID;
+//end textFiled
+// Navigator
+navigator : NAVIGATOR DOT OF OP CONTEXT CP DOT PUSH OP MATERIALPAGEROUTE OP BUILDER CO OP CONTEXT CP ARROW objectClass CP CP SCO;
+// end Navigator
 container : Container   width? height? (color COM? )? padding? margin? alignment? child? CP;
+
 
 //semanticContainer?
 //fit?
@@ -421,8 +435,8 @@ size2 : SizeName  Size OP  (FLOAT_NUM| INT_NUM) COM (FLOAT_NUM| INT_NUM) CP COM?
 
 //----------------- Column and ROW Widget and its parameters -------------
 
-row : ROW OP  align? spacing? padding? direction? childrenOfRow? CP;
-column :Column OP align? spacing? padding? direction? childrenOfColumn? CP;
+row : ROW OP align? spacing? padding? direction? childrenOfRow CP;
+column :Column OP align? spacing? padding? direction? childrenOfColumn CP;
 
 align : CrossAxisAlignment crossAxisAlignment COM? | MainAxisAlignment  mainAxisAlignment COM?;
 
@@ -447,25 +461,25 @@ childrenOfColumn : Children listOfWidget (COM listOfWidget)* ;
 
 singleChildScrollView : SingleChildScrollView OP scrollDirection? child CP;
 
-scrollDirection : ScrollDirection horizontal | vertical ;
+scrollDirection : ScrollDirection horizontal | vertical;
 
 
 //----------------- Padding Widget and its parameters -------------
 
-paddingWidget : Padding OP   padding? COM? paddingSize?  child CP ;
+paddingWidget : Padding OP   padding? COM? paddingSize?  child CP;
 
-paddingSize : FLOAT_NUM | edgeInsets | ALL | Symmetric | HorizontalName | VerticalName | Only ;
+paddingSize : FLOAT_NUM | edgeInsets | ALL | Symmetric | HorizontalName | VerticalName | Only;
 
 //----------------- Scaffold Widget and its parameters -------------
 
 
-scaffold : Scaffold OP appBar? body?  (FloatingActionButtonProp floatingActionButton)? CP |  Scaffold OP (FloatingActionButtonProp floatingActionButton)? appBar? body?   CP;
+scaffold : Scaffold OP appBar? body?  (FloatingActionButtonProp floatingActionButton)? CP ;
 
 body: Body listOfWidget;
 appBar: AppBar AppBarPara title? CP COM?;
 title: Title listOfWidget COM?;
 
-floatingActionButton: FloatingActionButton OP onPressed? color? child?  CP COM?;
+floatingActionButton: FloatingActionButton OP onPressed color? child? CP COM?;
 onPressed: OnPressed OP CP START block END COM? ;
 center: CenterWidget OP child CP;
 
@@ -478,8 +492,7 @@ home: Home widget;
 
 ///-------------- Image widget -------------------
 
-image : Image OP  image_provider  width? height?  alignment? color? padding? child? CP;
-//imageProperties:;
+image : Image OP  image_provider width? height?  alignment? color? padding? child? CP;
 image_provider :ImageProp ( assetImage | networkImage | fileImage ) COM?;
 assetImage : AssetImage STRING_singl CP;
 networkImage : NetworkImage STRING_singl CP ;

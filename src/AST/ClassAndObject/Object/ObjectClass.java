@@ -9,6 +9,8 @@ public class ObjectClass extends Call {
     public StringType stringType;
     public ObjectParameters objectParameters = null ;
 
+    public String name;
+
 
 
 
@@ -32,8 +34,5 @@ public class ObjectClass extends Call {
 
     public void setId(String id) {this.id = id;}
 
-    @Override
-    public String toString() {
-        return "ObjectClass{"  + id + '\n'  + stringType.toString() + '\n' + objectParameters.toString() + '}';
-    }
+
 }

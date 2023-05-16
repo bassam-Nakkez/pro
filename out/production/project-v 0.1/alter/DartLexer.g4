@@ -10,6 +10,7 @@ FLOAT_TYPE : 'float'|'FLOAT';
 DOUBLE_TYPE : 'DOUBLE'|'double';
 LABELTEXT:'labelText:';
 INPUTDECORATION:'InputDecoration';
+DECORATION : 'decoration:';
 CONTROLLER:'controller:';
 
 BUILDER : 'builder';

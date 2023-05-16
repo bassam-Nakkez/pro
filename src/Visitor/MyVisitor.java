@@ -13,12 +13,11 @@ import AST.Statements.Call;
 import AST.Statements.Declaration;
 import AST.Statements.Statement;
 import AST.Widget.*;
-import SymbolTableSructure.Data;
 import alter.DartParser;
 import alter.DartParserBaseVisitor;
-import org.antlr.v4.runtime.Token;
 
-
+import javax.tools.JavaFileManager;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class MyVisitor extends DartParserBaseVisitor {
     @Override
     public Parse visitParse(DartParser.ParseContext ctx) {
         Parse parse = new Parse();
+
         parse.setBlock(visitBlock(ctx.block()));
         return parse;
     }
@@ -50,30 +50,28 @@ public class MyVisitor extends DartParserBaseVisitor {
         {
             return  visitCall(ctx.call());
         }
-        else
+
             if (ctx.declaration() != null )
         {
             return visitDeclaration(ctx.declaration());
         }
-
-
-//        else if (ctx.assignment() != null)
+//         if (ctx.assignment() != null)
 //        {
 //            return visitAssignment(ctx.assignment());
 //        }
-//        else if (ctx.if_stat() != null)
+//         if (ctx.if_stat() != null)
 //        {
 //            return visitIf_stat(ctx.if_stat());
 //        }
-//        else if (ctx.loops() != null)
+//         if (ctx.loops() != null)
 //        {
 //            return visitLoops(ctx.loops());
 //        }
-//        else if (ctx.switch_stat() != null)
+//         if (ctx.switch_stat() != null)
 //        {
 //            return visitSwitch_stat(ctx.switch_stat());
 //        }
-        else
+
             if ( ctx.imports() != null )
         {
             for (int i = 0 ; i< ctx.imports().size(); i++)
@@ -84,10 +82,17 @@ public class MyVisitor extends DartParserBaseVisitor {
             }
         }
 
-            if(ctx.widget() != null)
+
+             if(ctx.widget() != null)
             {
-                return visitWidget(ctx.widget());
+                 visitWidget(ctx.widget());
             }
+
+             if(ctx.navigator()!=null)
+            {
+                visitNavigator(ctx.navigator());
+            }
+
         return null;
 
     }
@@ -110,7 +115,6 @@ public class MyVisitor extends DartParserBaseVisitor {
             return visitObjectMethod(ctx.objectMethod());
         }
         if (ctx.objectClass() != null) {
-
             return visitObjectClass(ctx.objectClass());
         }
         if (ctx.callFunction() != null) {
@@ -200,11 +204,9 @@ public class MyVisitor extends DartParserBaseVisitor {
 
         if (ctx.decVar() != null)
         {
-            Helper.symbolTable.parameter = true;
-            param.setVariableDeclaration(visitDecVar(ctx.decVar()));
-            Helper.symbolTable.parameter = false;
+          //   param.setVariableDeclaration(visitVarableDeclaration(ctx.decVar()));
 
-            return null;
+             return null;
 
         }
 
@@ -237,195 +239,48 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
         if(ctx.decVar() != null )
         {
-            visitDecVar(ctx.decVar());
-        }
-
-        if (ctx.decFun() != null) {
-            visitDecFun(ctx.decFun());
+            return null;
+                    //visitDecVar(ctx.decVar());
         }
 
 
-
-        return obj;
+        return null;
     }
 
 
     @Override
-    public VariableDeclaration visitDecVar(DartParser.DecVarContext ctx) {
-
-
+    public Object visitDecVar(DartParser.DecVarContext ctx) {
         VariableDeclaration vd = new VariableDeclaration();
-
-
-        Data data = new Data();
-        data.setType("variable");
-        String name = null;
-
-
         if (ctx.CONST()!=null ) {vd._const=true;}
         if (ctx.FINAL() != null){vd._final = true;}
-
-
-        if (ctx.nameType() != null) {
-            data.setDataType(visitNameType(ctx.nameType()));
-            vd.setType(data.getDataType());
-        }
-        if (ctx.ID()!= null) {
-            name = ctx.ID().getText();
-            vd.setVarName(ctx.ID().toString());
-            Token idToken =ctx.ID().getSymbol();
-            int line = idToken.getLine();
-            Helper.symbolTable.add2symbolTable( line  , name , data);
-
-        }
-        if (ctx.expr() != null) {
-
-
-         //  data.setValue(visitExpr(ctx.expr()).toString());
-            vd.setExpression(visitExpr(ctx.expr()));
-
-        }
-
-        if (ctx.call() != null) {
-            data.setValue(visitCall(ctx.call()).toString());
-
-        }
+        vd.setType(visitNameType(ctx.nameType()));
+        vd.setExpression(visitExpr(ctx.expr()));
+        vd.setVarName(ctx.ID().toString());
 
         return vd;
     }
 
     @Override
-    public Object visitDecFun(DartParser.DecFunContext ctx) {
-        Data data = new Data();
-        data.setType("function");
-        String name = null;
-
-        int line = 0;
-
-        if (ctx.returnType() != null) {
-          data.setDataType( visitReturnType(ctx.returnType())) ;
-        }
-
-
-        if (ctx.functionBody() != null  &&  ctx.ID() !=null )
-        {
-            name = ctx.ID().getText();
-            Token idToken =ctx.ID().getSymbol();
-            line = idToken.getLine();
-            Helper.symbolTable.add2symbolTable( line , name , data );
-            Helper.symbolTable.openScope(ctx.ID().getText());
-            visitFunctionBody(ctx.functionBody());
-            Helper.symbolTable.closeScope(ctx.ID().getText());
-        }
-
-       // if (ctx.CP() != null){ Helper.symbolTable.closeScope(ctx.ID().getText());}
-        return  null;
-
-    }
-
-    @Override
-    public Object visitFunctionBody(DartParser.FunctionBodyContext ctx) {
-
-
-        if (ctx.stat_block() != null) {
-            visitStat_block(ctx.stat_block());
-        }
-        return null;
-    }
-
-    @Override
-    public Object visitStat_block(DartParser.Stat_blockContext ctx) {
-
-        if (ctx.block() != null) {
-            visitBlock(ctx.block());
-        }
-        if (ctx.stat() != null) {
-            visitStat(ctx.stat());
-        }
-
-        if (ctx.return_() != null)
-        {
-            visitReturn(ctx.return_());
-        }
-        return null;
-    }
-
-    @Override
-    public String visitReturnType(DartParser.ReturnTypeContext ctx) {
-
-        if (ctx.VOID() != null){
-            return "void";
-        }
-        if (ctx.nameType() !=null){
-            return  visitNameType(ctx.nameType());
-        }
-        if( ctx.ID() != null )
-        {
-            return ctx.ID().getText();
-        }
-
-
-        return null;
-    }
-
-    @Override
     public Object visitReturn(DartParser.ReturnContext ctx) {
-
-        if (ctx.widget() != null) {
-          //  visitWidget(ctx.widget());
-        }
-
-        if (ctx.expr() != null)
-        {
-           // visitExpr(ctx.expr());
-        }
-
-        if (ctx.call() != null)
-        {
-           // visitCall(ctx.call());
-        }
-
-        if (ctx.objectClass() != null) {
-            //visitObjectClass(ctx.objectClass());
-        }
-
-        return null;
+        return super.visitReturn(ctx);
     }
 
 
 
     /////-----------<<  CLASS
 
+    @Override
+    public Object visitMethodBlock(DartParser.MethodBlockContext ctx) {
+        MethodBlock obj = new MethodBlock();
 
+        return obj;
+    }
 
 
 
     @Override
-    public MethodBody visitMethodBody(DartParser.MethodBodyContext ctx)
-    {
-
-        if (ctx.stat() != null) {
-
-            for (int i = 0 ; i< ctx.stat().size(); i++) {
-                visitStat(ctx.stat(i));
-            }
-        }
-
-        if (ctx.this_() != null) {
-
-
-            for (int i = 0 ; i< ctx.stat().size(); i++) {
-                visitThis(ctx.this_(i));
-            }
-        }
-
-        if (ctx.return_()!= null)
-        {
-            visitReturn(ctx.return_());
-        }
-
-        return null;
-
+    public Object visitMethodBody(DartParser.MethodBodyContext ctx) {
+        return super.visitMethodBody(ctx);
     }
 
 
@@ -436,29 +291,18 @@ public class MyVisitor extends DartParserBaseVisitor {
 
 
         ClassDeclaration obj = new ClassDeclaration();
-        Data data = new Data();
-        data.setType("class");
+
 
         if( ctx.ABSTRACT() != null)  obj.setAbstract(true);  else obj.setAbstract(false);
+        obj.setClassName(ctx.type_ID().toString());
         if(ctx.superclass() != null ) obj.setSuperClass( visitSuperclass(ctx.superclass()));
         if(ctx.interfaces() != null)
         {
-            //    obj.setAnInterfaces( visitInterfaces(ctx.interfaces()))
+        //    obj.setAnInterfaces( visitInterfaces(ctx.interfaces()))
         };
-
-
-        if(ctx.classBody() != null && ctx.ID() !=null )
+        if(ctx.classBody() != null )
         {
-            Token idToken =ctx.ID().getSymbol();
-            int line = idToken.getLine();
-
-            obj.setClassName(ctx.ID().toString());
-            String name = ctx.ID().getText();
-            Helper.symbolTable.add2symbolTable(line , name , data);
-            Helper.symbolTable.openScope(name);
-            obj.setClassBody(visitClassBody(ctx.classBody()));
-            Helper.symbolTable.closeScope(name);
-
+           // obj.setClassBody(visitClassBody(ctx.classBody()));
         }
 
         return obj;
@@ -477,36 +321,34 @@ public class MyVisitor extends DartParserBaseVisitor {
 
 
 
-
-
     @Override
     public ClassBody visitClassBody(DartParser.ClassBodyContext ctx) {
         ClassBody obj = new ClassBody();
-        for( int i=0 ; i< ctx.property().size() ; i++)
+
+        for( int i=0 ; i<= ctx.property().size() ; i++)
         {
             obj.getPropretes().add(visitProperty(ctx.property(i)));
         }
-        for (int i = 0 ; i < ctx.classMethod().size() ; i++)
+        for (int i = 0 ; i <= ctx.method().size() ; i++)
         {
-            obj.getMethods().add(visitClassMethod(ctx.classMethod(i)));
+            obj.getMethods().add(visitMethod(ctx.method(i)));
         }
-        // if( ctx.withConstructors() != null ){
-        //  obj.setWithConstructor(visitWithConstructors(ctx.withConstructors());}
+        if(ctx.withConstructors() != null ){ obj.setWithConstructor(visitWithConstructors(ctx.withConstructors()));}
+
         return obj;
-        }
+    }
 
 
     @Override
     public Property visitProperty(DartParser.PropertyContext ctx) {
+        Property obj = new Property();
 
-        Property property = new Property();
-
-        if (ctx.decVar() != null)
-        {
-         visitDecVar(ctx.decVar());
+        if(ctx.decVar() != null) {
+            obj.setVariableDeclaration(null);
+            // visitVarableDeclaration(ctx.decVar()))
         }
-        return property;
 
+        return null;
     }
 
     @Override
@@ -530,46 +372,47 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
         return null;
     }
-//    @Override
-//    public DefConstructor visitDefConstructor(DartParser.DefConstructorContext ctx) {
-//        DefConstructor defConstructor = new DefConstructor();
-//
-//        if(ctx.ID() != null) {
-//            defConstructor.setName(ctx.ID().getText());
-//        }
-//
-//        if(ctx.functionBody() != null) {
-//            defConstructor.setMethodBody(null);
-//            visitFunctionBody(ctx.functionBody());
-//        }
-//        return null;
-//    }
-//
-//    @Override
-//    public WithConstructor visitWithConstructors(DartParser.WithConstructorsContext ctx) {
-//        WithConstructor withConstructor = new WithConstructor();
-//
-//        if(ctx.constructor() != null) {
-//            withConstructor.setConstructor(visitConstructor(ctx.constructor()));
-//        }
-//
-//        if(ctx.defConstructor() != null) {
-//            withConstructor.setDefConstructor(visitDefConstructor((ctx.defConstructor())));
-//        }
-//
-//        if(ctx.method() != null) {
-//            for(int i = 0 ; i < ctx.method().size(); i++) {
-//                withConstructor.getMethods().add(visitMethod(ctx.method().get(i)));
-//            }
-//        }
-//
-//        if (ctx.property() != null) {
-//            for(int i = 0; i < ctx.property().size(); i++) {
-//                withConstructor.getProperties().add(visitProperty(ctx.property().get(i)));
-//            }
-//        }
-//        return null;
-//    }
+
+    @Override
+    public DefConstructor visitDefConstructor(DartParser.DefConstructorContext ctx) {
+        DefConstructor defConstructor = new DefConstructor();
+
+        if(ctx.ID() != null) {
+            defConstructor.setName(ctx.ID().getText());
+        }
+
+        if(ctx.functionBody() != null) {
+            defConstructor.setMethodBody(null);
+            visitFunctionBody(ctx.functionBody());
+        }
+        return null;
+    }
+
+    @Override
+    public WithConstructor visitWithConstructors(DartParser.WithConstructorsContext ctx) {
+        WithConstructor withConstructor = new WithConstructor();
+
+        if(ctx.constructor() != null) {
+            withConstructor.setConstructor(visitConstructor(ctx.constructor()));
+        }
+
+        if(ctx.defConstructor() != null) {
+            withConstructor.setDefConstructor(visitDefConstructor((ctx.defConstructor())));
+        }
+
+        if(ctx.method() != null) {
+            for(int i = 0 ; i < ctx.method().size(); i++) {
+                withConstructor.getMethods().add(visitMethod(ctx.method().get(i)));
+            }
+        }
+
+        if (ctx.property() != null) {
+            for(int i = 0; i < ctx.property().size(); i++) {
+                withConstructor.getProperties().add(visitProperty(ctx.property().get(i)));
+            }
+        }
+        return null;
+    }
 
     @Override
     public Interfaces visitInterfaces(DartParser.InterfacesContext ctx) {
@@ -617,7 +460,7 @@ public class MyVisitor extends DartParserBaseVisitor {
            modExpr.setLeft(visitExpr(ctx.expr(0)));
            modExpr.setRight(visitExpr(ctx.expr(1)));
            return modExpr;
-
+           
        }
        else if(ctx.DIV() != null )
        {
@@ -651,37 +494,34 @@ public class MyVisitor extends DartParserBaseVisitor {
     }
 
 
-    @Override
-    public Method visitClassMethod(DartParser.ClassMethodContext ctx) {
-        Method obj = new Method();
-        Data data = new Data();
-        data.setType("method");
-        String name = null;
 
+    @Override
+    public Method visitMethod(DartParser.MethodContext ctx) {
+        Method obj = new Method();
 
         if(ctx.returnType() != null) {
-            String dataType = visitReturnType(ctx.returnType());
-            obj.setReturnType(dataType);
-            data.setDataType(dataType);
+            obj.setReturnType(null);
+            // visitReturnType(ctx.returnType())
+        }
+        else if(ctx.ID(0) != null) {
+            obj.setReturnType(ctx.ID(0).getText());
+        }
 
+        if(ctx.ID(1) != null) {
+            obj.setMethodName(ctx.ID(1).getText());
         }
 
         if(ctx.parameterMethods() != null) {
-            //obj.getParameters().add(null);
+            obj.getParameters().add(null);
             // visitParameterMethods(ctx.parameterMethods())
         }
 
-        if(ctx.methodBody() != null && ctx.ID() != null)
+        if(ctx.methodBody() != null)
         {
-            name = ctx.ID().getText();
-            Token idToken =ctx.ID().getSymbol();
-            int line = idToken.getLine();
-            Helper.symbolTable.add2symbolTable(line, name ,data);
-            Helper.symbolTable.openScope(name);
-            obj.setMethodBody(visitMethodBody(ctx.methodBody()));
-            Helper.symbolTable.closeScope(name);
+            obj.setMethodBody(null);
+            // visitParameterMethods(ctx.parameterMethods())
         }
-        return obj;
+        return null;
     }
 
     @Override
@@ -818,13 +658,16 @@ public class MyVisitor extends DartParserBaseVisitor {
     @Override
     public ObjectClass visitObjectClass(DartParser.ObjectClassContext ctx) {
         ObjectClass objectClass = new ObjectClass();
+
+        objectClass.name=ctx.ID().toString();
+
         if(ctx.objectParameters() != null) {
             objectClass.setObjectParameters(visitObjectParameters(ctx.objectParameters()));
         }
-        if(ctx.STRING_singl() != null) {
-         return  null;  // objectClass.setStringType(ctx.STRING_singl().getText());
-        }
-        return null;
+//        if(ctx.STRING_singl() != null) {
+//         return  null;  // objectClass.setStringType(ctx.STRING_singl().getText());
+//        }
+        return objectClass;
     }
 
     @Override
@@ -841,23 +684,23 @@ public class MyVisitor extends DartParserBaseVisitor {
     @Override
     public ObjectParameter visitObjectParameter(DartParser.ObjectParameterContext ctx) {
         ObjectParameter objectParameter = new ObjectParameter();
-        if(ctx.ID(0) != null) {
-            objectParameter.setObjectName(ctx.ID(0).getText());
-        }
-        if(ctx.objectClass() != null) {
-            objectParameter.setObjectClass(visitObjectClass( ctx.objectClass() ));
-        }
-        if(ctx.ID(1) != null) {
-            objectParameter.setID(ctx.ID(1).getText());
-        }
-        if(ctx.call() != null) {
-            objectParameter.setCall(visitCall(ctx.call(1)));
-        }
-        if(ctx.arrowAndAnonFun() != null) {
-//            objectParameter.setAnonymousFunction(visitArrowAndAnonFun(ctx.arrowAndAnonFun()));
-        }
+//        if(ctx.ID(0) != null) {
+//            objectParameter.setObjectName(ctx.ID(0).getText());
+//        }
+//        if(ctx.objectClass() != null) {
+//            objectParameter.setObjectClass(visitObjectClass( ctx.objectClass() ));
+//        }
+//        if(ctx.ID(1) != null) {
+//            objectParameter.setID(ctx.ID(1).getText());
+//        }
+//        if(ctx.call() != null) {
+//            objectParameter.setCall(visitCall(ctx.call(1)));
+//        }
+//        if(ctx.arrowAndAnonFun() != null) {
+////            objectParameter.setAnonymousFunction(visitArrowAndAnonFun(ctx.arrowAndAnonFun()));
+//        }
         if(ctx.data() != null) {
-//            objectParameter.setData(visitData(ctx.data()));
+            objectParameter.setObjectName(ctx.data().getChild(0).toString());
         }
         return null;
     }
@@ -990,13 +833,13 @@ public class MyVisitor extends DartParserBaseVisitor {
         if (ctx.VAR() != null) {
             return ctx.VAR().getText();
         }
-         else
-         {
-             return "";
-             //visitObjectType(ctx.objectType());
-         }
+        if (ctx.objectType() != null )
+        {
+//            return visitObjectType(ctx.objectType());
+            return "";
+        }
 
-
+        return "";
     }
 
 
@@ -1168,8 +1011,7 @@ public class MyVisitor extends DartParserBaseVisitor {
     public Widget visitWidget(DartParser.WidgetContext ctx) {
 
         Widget widget = new Widget();
-        String htmlCode =
-                "<html> \n <head>\n" +
+        String htmlCode =" <html> \n <head>\n" +
                 "                    <meta charset=\"UTF-8\">\n" +
                 "                    <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n" +
                 "                    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n" +
@@ -1178,23 +1020,21 @@ public class MyVisitor extends DartParserBaseVisitor {
                 "                </head>\n" +
                 "                <body>";
 
-        FileManagement.addToHtmlFile(htmlCode);
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile(htmlCode);
         if (ctx.listOfWidget()!= null)
         {
           widget =  visitListOfWidget(ctx.listOfWidget());
         }
-
         htmlCode = "\n</body>\n" +
                 " </html>";
-        FileManagement.addToHtmlFile(htmlCode);
+Helper.files.get(Helper.currentHtmlName).addToHtmlFile(htmlCode);
 
 
 
+        FileManagement.writeToTheFile("../style.css" ,FileManagement.CssCode );
+        FileManagement.writeToTheFile("../"+Helper.currentHtmlName+".php" ,Helper.files.get(Helper.currentHtmlName).htmlCode);
 
-        FileManagement.writeToTheFile("style.css" ,FileManagement.CssCode );
-        FileManagement.writeToTheFile("Code.php" ,FileManagement.htmlCode );
         return widget;
-
     }
 
 
@@ -1220,20 +1060,16 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
         if (ctx.row()!=null)
         {
-            FileManagement.addToHtmlFile("<table>");
-
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<table>");
            widget =  visitRow(ctx.row());
 
-            FileManagement.addToHtmlFile("</table>");
-        }
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</table>");        }
         if (ctx.column() != null) {
 
-            FileManagement.addToHtmlFile("<table>");
-
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<table>");
            widget = visitColumn(ctx.column());
 
-            FileManagement.addToHtmlFile("</table>");
-
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</table>");
         }
 
         if (ctx.sizedBox() != null) {
@@ -1247,6 +1083,11 @@ public class MyVisitor extends DartParserBaseVisitor {
 
         if (ctx.scaffold() != null) {
             visitScaffold(ctx.scaffold());
+        }
+
+        if(ctx.textFiled() != null)
+        {
+            visitTextFiled(ctx.textFiled());
         }
 
         return widget;
@@ -1284,14 +1125,14 @@ public class MyVisitor extends DartParserBaseVisitor {
         cssCode+= "}";
         FileManagement.addToCssFile(cssCode);
 
-        String code = "<div class =\""+container.widgetName+"\" >";
-        FileManagement.addToHtmlFile(code);
+        String code = "<div class ='"+container.widgetName+"' >";
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile(code);
         if(ctx.child() != null)
         {
             container.setChild(visitChild(ctx.child()));
         }
 
-        FileManagement.addToHtmlFile("</div>");
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</div>");
 
         Helper.widgets.put(container.widgetName , container);
         return container;
@@ -1375,15 +1216,15 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
 
 
-        FileManagement.addToHtmlFile("\n<span class=\""+text.getWidgetName()+"\">");
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("\n<span class=\""+text.getWidgetName()+"\">");
 
         if (ctx.text_data() != null)
         {
             text.setData(visitText_data(ctx.text_data()));
-            FileManagement.addToHtmlFile(text.getData());
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile(text.getData());
         }
 
-        FileManagement.addToHtmlFile("<span/>");
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<span/>");
         return text;
     }
 
@@ -1450,9 +1291,9 @@ public class MyVisitor extends DartParserBaseVisitor {
         Center center = new Center();
         if (ctx.child()!= null)
         {
-            FileManagement.addToHtmlFile("\n<center>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("\n<center>");
             center.setChild(visitChild(ctx.child()));
-            FileManagement.addToHtmlFile("</center>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</center>");
 
         }
         return center;
@@ -1502,14 +1343,14 @@ public class MyVisitor extends DartParserBaseVisitor {
 
         for (int i=0 ; i < ctx.listOfWidget().size() ; i++ )
         {
-            //FileManagement.addToHtmlFile("<div class=\"column\">\n");
+            //Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<div class=\"column\">\n");
 
 
-            FileManagement.addToHtmlFile("<tr>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<tr>");
 
             column.getChildren().add(visitListOfWidget(ctx.listOfWidget().get(i)));
 
-            FileManagement.addToHtmlFile("</tr>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</tr>");
         }
 
 
@@ -1554,19 +1395,19 @@ public class MyVisitor extends DartParserBaseVisitor {
     public Widget visitChildrenOfRow(DartParser.ChildrenOfRowContext ctx) {
 
         Row row = new Row();
-        FileManagement.addToHtmlFile("<tr>");
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<tr>");
 
         for (int i=0 ; i < ctx.listOfWidget().size() ; i++ )
         {
-            FileManagement.addToHtmlFile("<th>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<th>");
 
 
             row.getChildren().add( visitListOfWidget(ctx.listOfWidget().get(i)));
 
-            FileManagement.addToHtmlFile("</th>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</th>");
 
         }
-        FileManagement.addToHtmlFile("</tr>");
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</tr>");
 
         return row;
     }
@@ -1584,16 +1425,16 @@ public class MyVisitor extends DartParserBaseVisitor {
         if (ctx.size() != null) {
             sizedBox = (SizedBox) visitSize(ctx.size());
             String code = "<div class =\""+sizedBox.getWidgetName()+ "\">";
-            FileManagement.addToHtmlFile(code);
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile(code);
 
-          FileManagement.addToHtmlFile("");
+          Helper.files.get(Helper.currentHtmlName).addToHtmlFile("");
 
             if (ctx.child() != null) {
 
                sizedBox.setChild( visitChild(ctx.child()));
             }
 
-            FileManagement.addToHtmlFile("</div>");
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</div>");
         }
 
 
@@ -1660,9 +1501,7 @@ public class MyVisitor extends DartParserBaseVisitor {
         if (ctx.image_provider()!=null)
         {
             image.setLink(visitImage_provider(ctx.image_provider()));
-            String link = image.getLink();
-            link = link.substring(1,link.length()-1);
-            htmlCode +=" src= \" "+link+" \" ";
+            htmlCode +=" src="+image.getLink();
         }
         if ( ctx.width() != null)
         {
@@ -1687,8 +1526,7 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
 
         htmlCode +=">";
-        FileManagement.addToHtmlFile(htmlCode);
-
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile(htmlCode);
         return image;
     }
 
@@ -1706,7 +1544,10 @@ public class MyVisitor extends DartParserBaseVisitor {
     public String visitAssetImage(DartParser.AssetImageContext ctx) {
         if (ctx.STRING_singl() != null)
         {
-            return ctx.STRING_singl().getText();
+            String local="http://localhost/project-v 0.1/";
+            String image=ctx.STRING_singl().getText();
+            image=image.substring(1,image.length()-1);
+            return '"'+local+image+'"';
         }
         return null;
     }
@@ -1723,7 +1564,7 @@ public class MyVisitor extends DartParserBaseVisitor {
 
         Scaffold scaffold = new Scaffold();
 //        FileManagement.addToCssFile(".scaffold {");
-//        FileManagement.addToHtmlFile("<div class=\"scaffold\">");
+//        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<div class=\"scaffold\">");
 
         if (ctx.floatingActionButton()!= null) {
 
@@ -1739,7 +1580,7 @@ public class MyVisitor extends DartParserBaseVisitor {
         }
 
 
-       // FileManagement.addToHtmlFile("</div>");
+       // Helper.files.get(Helper.currentHtmlName).addToHtmlFile("</div>");
         return scaffold;
     }
 
@@ -1766,16 +1607,11 @@ public class MyVisitor extends DartParserBaseVisitor {
 
 
         FloatingActionButton button = new FloatingActionButton();
-        String link = "#";
+
 
         if (ctx.onPressed() != null) {
-
             visitOnPressed(ctx.onPressed());
-
-            // Code..
-
         }
-
 
         String cssCode = ".floating-button {\n" +
                 "  position: fixed;\n" +
@@ -1787,7 +1623,8 @@ public class MyVisitor extends DartParserBaseVisitor {
                 "  border-radius: 50%;\n" +
                 "  text-align: center;\n" +
                 "  box-shadow: 0 5px 6px rgba(0, 0, 0, 0.3);\n" +
-                "  z-index: 999;\n";
+                "  z-index: 999;\n"+
+                "  text-decoration:none;\n";
 
         if (ctx.color() != null) {
            cssCode +="  background-color:" + visitColor(ctx.color())+";\n";
@@ -1797,7 +1634,6 @@ public class MyVisitor extends DartParserBaseVisitor {
             cssCode += "  background-color: rgba(0,155,255);\n" ;
         }
         FileManagement.addToCssFile(cssCode +="}\n");
-        FileManagement.addToHtmlFile("<a href=\""+link+"\" class=\"floating-button\">+</a>");
 
 
         if (ctx.child() != null)
@@ -1808,21 +1644,60 @@ public class MyVisitor extends DartParserBaseVisitor {
         return button;
     }
 
+    // TextFiled
+
 
     @Override
-    public Object visitOnPressed(DartParser.OnPressedContext ctx) {
+    public Object visitTextFiled(DartParser.TextFiledContext ctx) {
+            TextFiled tf=new TextFiled();
+            String cssCode = "";
+            if(ctx.attribute().size()!=0) {
+                cssCode+="\n#"+ tf.getWidgetName()+"{";
+                for (DartParser.AttributeContext attr : ctx.attribute()) {
+                    if(attr.inputDecoration()!=null)
+                    {
+                        tf.labelText+=visit(attr.inputDecoration());
+                    }
+                    else if(attr.width()!=null)
+                    {
+                        cssCode+="\n width:"+visitWidth(attr.width())+"%\n";
+                    }
+                    else {
+                        // add the variable controller to array session
+                    }
+                }
+                cssCode+="}";
+            }
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile(tf.buildCode());
+            FileManagement.addToCssFile(cssCode);
+
+            return null;
+    }
 
 
-        FileManagement.addToHtmlFile("<?php ");
-        if (ctx.block() == null) {
 
-            visitBlock(ctx.block());
+    @Override
+    public String visitInputDecoration(DartParser.InputDecorationContext ctx) {
+        return ctx.label().STRING().toString();
+    }
+
+    //Navigator
 
 
+
+    @Override
+    public Object visitNavigator(DartParser.NavigatorContext ctx) {
+        ObjectClass link = visitObjectClass(ctx.objectClass());
+        if(link.objectParameters!=null)
+        {
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<?php ");
+            for (ObjectParameter parameter : link.objectParameters.getObjectParameters()) {
+                    Helper.files.get(Helper.currentHtmlName).addToHtmlFile("\n $__SESSION["+parameter.objectName+"]=Map varible value");
+            }
+            Helper.files.get(Helper.currentHtmlName).addToHtmlFile("?>");
         }
-        FileManagement.addToHtmlFile("?>");
-
-        return null;
+        Helper.files.get(Helper.currentHtmlName).addToHtmlFile("<a href=\""+link.name+".php\" class=\"floating-button\">+</a>");
+        return super.visitNavigator(ctx);
     }
 }
 

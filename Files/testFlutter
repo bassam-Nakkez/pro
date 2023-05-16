@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
 
+
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -15,7 +16,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 }
 
-class NewPadding extends StatelessWidget {
+class NewPadding222 extends StatelessWidget {
   final String image1;
   final String text1;
   final String text2;
