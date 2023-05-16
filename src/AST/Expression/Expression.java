@@ -6,8 +6,11 @@ import java.util.List;
 
 public  class Expression extends Node {
 
-    public String result;
 
+//    @Override
+//    public String toString() {
+//        return "Expression { ";
+//    }
 
 
 }

@@ -228,6 +228,12 @@ public interface DartParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitReturn(DartParser.ReturnContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link DartParser#methodBlock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMethodBlock(DartParser.MethodBlockContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link DartParser#methodBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -276,17 +282,29 @@ public interface DartParserVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProperty(DartParser.PropertyContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link DartParser#classMethod}.
+	 * Visit a parse tree produced by {@link DartParser#method}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitClassMethod(DartParser.ClassMethodContext ctx);
+	T visitMethod(DartParser.MethodContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DartParser#constructor}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitConstructor(DartParser.ConstructorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#defConstructor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDefConstructor(DartParser.DefConstructorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#withConstructors}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitWithConstructors(DartParser.WithConstructorsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DartParser#superclass}.
 	 * @param ctx the parse tree
@@ -512,6 +530,42 @@ public interface DartParserVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitListOfWidget(DartParser.ListOfWidgetContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#textFiled}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTextFiled(DartParser.TextFiledContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#attribute}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttribute(DartParser.AttributeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#inputDecoration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInputDecoration(DartParser.InputDecorationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#label}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLabel(DartParser.LabelContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#controller}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitController(DartParser.ControllerContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link DartParser#navigator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNavigator(DartParser.NavigatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link DartParser#container}.
 	 * @param ctx the parse tree

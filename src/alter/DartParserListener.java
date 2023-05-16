@@ -370,6 +370,16 @@ public interface DartParserListener extends ParseTreeListener {
 	 */
 	void exitReturn(DartParser.ReturnContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link DartParser#methodBlock}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodBlock(DartParser.MethodBlockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#methodBlock}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodBlock(DartParser.MethodBlockContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link DartParser#methodBody}.
 	 * @param ctx the parse tree
 	 */
@@ -450,15 +460,15 @@ public interface DartParserListener extends ParseTreeListener {
 	 */
 	void exitProperty(DartParser.PropertyContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link DartParser#classMethod}.
+	 * Enter a parse tree produced by {@link DartParser#method}.
 	 * @param ctx the parse tree
 	 */
-	void enterClassMethod(DartParser.ClassMethodContext ctx);
+	void enterMethod(DartParser.MethodContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link DartParser#classMethod}.
+	 * Exit a parse tree produced by {@link DartParser#method}.
 	 * @param ctx the parse tree
 	 */
-	void exitClassMethod(DartParser.ClassMethodContext ctx);
+	void exitMethod(DartParser.MethodContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DartParser#constructor}.
 	 * @param ctx the parse tree
@@ -469,6 +479,26 @@ public interface DartParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitConstructor(DartParser.ConstructorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#defConstructor}.
+	 * @param ctx the parse tree
+	 */
+	void enterDefConstructor(DartParser.DefConstructorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#defConstructor}.
+	 * @param ctx the parse tree
+	 */
+	void exitDefConstructor(DartParser.DefConstructorContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#withConstructors}.
+	 * @param ctx the parse tree
+	 */
+	void enterWithConstructors(DartParser.WithConstructorsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#withConstructors}.
+	 * @param ctx the parse tree
+	 */
+	void exitWithConstructors(DartParser.WithConstructorsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DartParser#superclass}.
 	 * @param ctx the parse tree
@@ -845,6 +875,66 @@ public interface DartParserListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitListOfWidget(DartParser.ListOfWidgetContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#textFiled}.
+	 * @param ctx the parse tree
+	 */
+	void enterTextFiled(DartParser.TextFiledContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#textFiled}.
+	 * @param ctx the parse tree
+	 */
+	void exitTextFiled(DartParser.TextFiledContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttribute(DartParser.AttributeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#attribute}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttribute(DartParser.AttributeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#inputDecoration}.
+	 * @param ctx the parse tree
+	 */
+	void enterInputDecoration(DartParser.InputDecorationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#inputDecoration}.
+	 * @param ctx the parse tree
+	 */
+	void exitInputDecoration(DartParser.InputDecorationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#label}.
+	 * @param ctx the parse tree
+	 */
+	void enterLabel(DartParser.LabelContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#label}.
+	 * @param ctx the parse tree
+	 */
+	void exitLabel(DartParser.LabelContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#controller}.
+	 * @param ctx the parse tree
+	 */
+	void enterController(DartParser.ControllerContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#controller}.
+	 * @param ctx the parse tree
+	 */
+	void exitController(DartParser.ControllerContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link DartParser#navigator}.
+	 * @param ctx the parse tree
+	 */
+	void enterNavigator(DartParser.NavigatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link DartParser#navigator}.
+	 * @param ctx the parse tree
+	 */
+	void exitNavigator(DartParser.NavigatorContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link DartParser#container}.
 	 * @param ctx the parse tree

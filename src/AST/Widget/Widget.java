@@ -1,6 +1,7 @@
 package AST.Widget;
 
 import AST.Statements.Statement;
+import SembolTableStructure.VaraibleType._Variable;
 
 
 import java.util.ArrayList;

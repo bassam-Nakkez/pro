@@ -6,17 +6,7 @@
         <PerGrammarGenerationSettings>
           <option name="fileName" value="$PROJECT_DIR$/src/alter/DartParser.g4" />
           <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\xampp\htdocs\projectC\src" />
-          <option name="libDir" value="" />
-          <option name="encoding" value="" />
-          <option name="pkg" value="" />
-          <option name="language" value="" />
-          <option name="generateVisitor" value="true" />
-        </PerGrammarGenerationSettings>
-        <PerGrammarGenerationSettings>
-          <option name="fileName" value="$PROJECT_DIR$/src/alter/DartLexer.g4" />
-          <option name="autoGen" value="true" />
-          <option name="outputDir" value="C:\xampp\htdocs\projectC\src" />
+          <option name="outputDir" value="C:\xampp\htdocs\project-v 0.1\src" />
           <option name="libDir" value="" />
           <option name="encoding" value="" />
           <option name="pkg" value="" />
@@ -26,7 +16,7 @@
       </list>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_19" project-jdk-name="liberica-20" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_19" default="true" project-jdk-name="openjdk-19 (3)" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

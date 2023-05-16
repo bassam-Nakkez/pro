@@ -27,7 +27,7 @@ stat
  |if_stat
  |loops
  |switch_stat
- |imports* SCO
+ |imports* SCO //delete
  |widget
  |navigator
  ;
@@ -188,21 +188,21 @@ cond: call Q call (CO call)?;
 
 // ------------------------<<<  Object >>-----------------
 
-	objectClass : CONST? NEW? ID OP (objectParameters)? CP;
+objectClass : CONST? NEW? ID OP (objectParameters)? CP;
 //objectClass : CONST? NEW? ID OP (objectParameters |STRING_singl (COM objectParameters)?) CP;
 
 objectParameter :ID CO NEW? (
-                LT ID GT OB objectClass CB
-                |ID? Q? objectClass
-                |LT ID GT OB objectClass CB
-                |data
-                |call
-                |anonArray COM?
-                |arrowAndAnonFun
-                |OB NEW? call (COM call )* CB
-                |cond
-                | FALSE
-                |TRUE )
+//                LT ID GT OB objectClass CB
+//                |ID? Q? objectClass
+//                |LT ID GT OB objectClass CB
+                    data
+//                |anonArray COM?
+//                |arrowAndAnonFun
+//                |OB NEW? call (COM call )* CB
+//                |cond
+//                | FALSE
+//                |TRUE
+                )
                 ;
 
 objectParameters : objectParameter ( COM objectParameter)* COM?;
@@ -215,7 +215,7 @@ objectDeclaration : ID objectClass;
 classBody : (  ( OVERRIDE?  method )+ | property )* withConstructors? (  ( OVERRIDE?  method )+ | property )* ;
 
 
-const: CONST ID ;
+const: CONST ID;
 
 decVar
       : (CONST |FINAL? nameType ) ID (E (expr|bool|call))?  ;
@@ -223,7 +223,7 @@ decVar
 
 
 
-num  :INT_NUM                   #intNumber
+num  :INT_NUM                #intNumber
         |FLOAT_NUM              #floatNumber
         |DOUBLE_NUM             #doubleNumber
         ;
@@ -312,6 +312,7 @@ identi
 
 
 
+
 //----------------- <<<<<(( Flutter ))>>>>> -------------
 
 
@@ -338,7 +339,18 @@ identi
 
 //----------------- Container Widget and its parameters -------------
 
+//textFiled
+textFiled: TextFiled OP  attribute+ CP;
+                          attribute: (width COM?|inputDecoration COM?|controller COM?);
+                          inputDecoration: DECORATION  INPUTDECORATION OP label CP;
+                          label: LABELTEXT STRING;
+                          controller: CONTROLLER ID;
+//end textFiled
+// Navigator
+navigator : NAVIGATOR DOT OF OP CONTEXT CP DOT PUSH OP MATERIALPAGEROUTE OP BUILDER CO OP CONTEXT CP ARROW objectClass CP CP SCO;
+// end Navigator
 container : Container   width? height? (color COM? )? padding? margin? alignment? child? CP;
+
 
 //semanticContainer?
 //fit?
@@ -365,15 +377,15 @@ vertical:Vertical ( FLOAT_NUM| INT_NUM ) COM?;
 
 alignment :AlignmentNamePro Alignment (alignmentX | alignmentY) COM?;
 
-alignmentX : Center | Start | End | SpaceBetween | SpaceAround | SpaceEvenly;
+alignmentX :Center| Start | End | SpaceBetween | SpaceAround | SpaceEvenly;
 alignmentY :TOP | Bottom | Center;
 
 // Color parameter
-color : colorName | colorHEX | colorRGB | colorHSV ;
-colorName : ColorName Colors ID | ColorName Colors ID OP INT_NUM CP COM?;
-colorHEX  : POUND HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT COM?;
-colorRGB  : COLOR INT_NUM COM INT_NUM COM INT_NUM CP COM?;
-colorHSV  : ColorFromHSV (FLOAT_NUM| INT_NUM) COM (FLOAT_NUM| INT_NUM) COM (FLOAT_NUM| INT_NUM) CP COM?;
+color: colorName | colorHEX | colorRGB | colorHSV ;
+colorName:  ColorName Colors ID | ColorName Colors ID OP INT_NUM CP COM?;
+colorHEX : POUND HEXDIGIT HEXDIGIT HEXDIGIT HEXDIGIT COM?;
+colorRGB : COLOR INT_NUM COM INT_NUM COM INT_NUM CP COM?;
+colorHSV : ColorFromHSV (FLOAT_NUM| INT_NUM) COM (FLOAT_NUM| INT_NUM) COM (FLOAT_NUM| INT_NUM) CP COM?;
 
 
 //----------------- text Widget and its parameters -------------
@@ -461,12 +473,10 @@ paddingSize : FLOAT_NUM | edgeInsets | ALL | Symmetric | HorizontalName | Vertic
 //----------------- Scaffold Widget and its parameters -------------
 
 
-scaffold : Scaffold OP (FloatingActionButtonProp floatingActionButton)? appBar? body? CP ;
+scaffold : Scaffold OP appBar? body?  (FloatingActionButtonProp floatingActionButton)? CP ;
 
-body: Body listOfWidget COM?;
-
+body: Body listOfWidget;
 appBar: AppBar AppBarPara title? CP COM?;
-
 title: Title listOfWidget COM?;
 
 floatingActionButton: FloatingActionButton OP onPressed color? child? CP COM?;
@@ -487,20 +497,3 @@ image_provider :ImageProp ( assetImage | networkImage | fileImage ) COM?;
 assetImage : AssetImage STRING_singl CP;
 networkImage : NetworkImage STRING_singl CP ;
 fileImage : FileImage File OP STRING_singl CP ;
-
-//-------------- Navigator widget  -------------------
-
-navigator : NAVIGATOR DOT OF OP CONTEXT CP DOT PUSH OP MATERIALPAGEROUTE OP BUILDER CO OP CONTEXT CP ARROW objectClass CP COM;
-
-
-
-//-------------- textFiled widget  -------------------
-
-textFiled: TextFiled OP  attribute+ CP;
-                          attribute: (width COM|inputDecoration COM|controller COM);
-                          inputDecoration: INPUTDECORATION OP label CP;
-                          label: LABELTEXT STRING;
-                          controller: CONTROLLER ID;
-
-
-
